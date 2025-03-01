@@ -102,7 +102,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 			<button id="light__button" class="container Light__on">Вімкнути</button>
 		</main>
 		<script>
-			var e=document.getElementById("light__button");var n=!1;window.addEventListener("load",(()=>{const o=new WebSocket("ws://localhost:8180/ws");o.onerror=e=>{console.log("WEBSOCKET_ERROR ",e)},o.onmessage=o=>{n="1"===o.data,e.className="container "+(n?"Light__off":"Light__on"),e.innerHTML=n?"Вимкнути":"Ввімнкути",console.log("1"===o.data&&!0)},e.addEventListener("click",(()=>{o.send("updateLite")}))}));
+			var e=document.getElementById("light__button");var n=!1;window.addEventListener("load",(()=>{const o=new WebSocket(`ws://${window.location.host}/ws`);o.onerror=e=>{console.log("WEBSOCKET_ERROR ",e)},o.onmessage=o=>{n="1"===o.data,e.className="container "+(n?"Light__off":"Light__on"),e.innerHTML=n?"Вимкнути":"Ввімнкути",console.log("1"===o.data&&!0)},e.addEventListener("click",(()=>{o.send("updateLite")}))}));
 		</script>
 	</body>
 </html>
