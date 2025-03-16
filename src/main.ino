@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
+// Параметри WiFi мережі
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
@@ -9,6 +9,7 @@ const int light = 13;
 int buttonLastState = 0;
 bool ligthState = false;
 
+// Розмітка веб сторінки
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
@@ -107,10 +108,11 @@ const char index_html[] PROGMEM = R"rawliteral(
 	</body>
 </html>
 )rawliteral";
-
+// ініціалізація веб-сервера
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
+// обробник данних
 void messageEvent(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
@@ -121,16 +123,19 @@ void messageEvent(void *arg, uint8_t *data, size_t len) {
     }
   }
 }
-// web socket state handling
+//обробка стану веб сокету
 void eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type)
   {
+	// Якщо користувач під'єднанний
   case WS_EVT_CONNECT:
     Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
     break;
+	// Якщо користувач від'єднанний
   case WS_EVT_DISCONNECT: 
   Serial.printf("ws[%s][%u] disconnect: %u\n", server->url(), client->id());
   break;
+	// Якщо полученні якісь данні
   case WS_EVT_DATA: 
   messageEvent(arg, data, len);
   break;
@@ -144,7 +149,7 @@ void setup() {
   pinMode(light, OUTPUT);
   pinMode(12, INPUT_PULLUP);
 
-  // Connect to wifi
+  // Під'єднання до мережі
   Serial.print("Connecting to ");
   Serial.println(ssid);
 
@@ -157,7 +162,7 @@ void setup() {
   
   Serial.println("");
   Serial.println("Connected..!");
-
+	// Підключення веб серверу
   ws.onEvent(eventHandler);
   server.addHandler(&ws);
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
